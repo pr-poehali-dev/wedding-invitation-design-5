@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Icon from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,6 +35,8 @@ const Index = () => {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -54,6 +56,43 @@ const Index = () => {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      if (audioRef.current && !isPlaying) {
+        audioRef.current.play().then(() => {
+          setIsPlaying(true);
+        }).catch(err => {
+          console.log('Autoplay prevented:', err);
+        });
+      }
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('scroll', handleUserInteraction);
+    };
+
+    document.addEventListener('click', handleUserInteraction);
+    document.addEventListener('touchstart', handleUserInteraction);
+    document.addEventListener('scroll', handleUserInteraction);
+
+    return () => {
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('scroll', handleUserInteraction);
+    };
+  }, [isPlaying]);
+
+  const toggleMusic = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        audioRef.current.play();
+        setIsPlaying(true);
+      }
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
@@ -61,6 +100,25 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
+      <audio 
+        ref={audioRef} 
+        loop 
+        preload="auto"
+      >
+        <source src="/wedding-song.mp3" type="audio/mpeg" />
+      </audio>
+
+      <button
+        onClick={toggleMusic}
+        className="fixed top-6 right-6 z-50 w-14 h-14 bg-white/90 backdrop-blur-sm border-2 border-gold rounded-full shadow-lg hover:bg-gold hover:text-white transition-all duration-300 flex items-center justify-center group"
+        aria-label={isPlaying ? 'Пауза' : 'Воспроизвести музыку'}
+      >
+        {isPlaying ? (
+          <Icon name="Pause" className="w-6 h-6 text-gold group-hover:text-white" />
+        ) : (
+          <Icon name="Play" className="w-6 h-6 text-gold group-hover:text-white" />
+        )}
+      </button>
       <section className="min-h-screen flex items-center justify-center px-4 py-20 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-20 left-10 w-72 h-72 bg-gold rounded-full blur-3xl" />
