@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Icon from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,16 +8,56 @@ import { Card } from '@/components/ui/card';
 const weddingDate = new Date('2026-02-12T00:00:00');
 
 const guestsList = [
-  { name: 'Ольга', category: 'Родители невесты' },
-  { name: 'Людмила и Пётр', category: 'Родители жениха' },
-  { name: 'Евгения и Сергей', category: 'Гости' },
-  { name: 'Наталья и Евгений', category: 'Гости' },
-  { name: 'Алёна и Александр', category: 'Гости' },
-  { name: 'Оксана и Сергей', category: 'Гости' },
-  { name: 'Елизавета и Артём', category: 'Гости' },
-  { name: 'Андрей', category: 'Гости' },
-  { name: 'Лидия', category: 'Гости' },
-  { name: 'Никита', category: 'Гости' }
+  { 
+    name: 'Ольга', 
+    category: 'Родители невесты',
+    message: 'Дорогая мама, спасибо за твою любовь и поддержку. Ты всегда была рядом, и этот день особенный благодаря тебе. Ждём тебя с распростёртыми объятиями!' 
+  },
+  { 
+    name: 'Людмила и Пётр', 
+    category: 'Родители жениха',
+    message: 'Дорогие родители, ваша мудрость и забота сделали меня тем, кто я есть. Этот день невозможен без вашего благословения. Ждём вас с огромной радостью!'
+  },
+  { 
+    name: 'Евгения и Сергей', 
+    category: 'Гости',
+    message: 'Дорогие друзья, ваша дружба — это настоящее сокровище. Мы так рады, что вы разделите с нами этот важный день!'
+  },
+  { 
+    name: 'Наталья и Евгений', 
+    category: 'Гости',
+    message: 'Дорогие Наталья и Евгений, вы всегда были примером крепкой и счастливой семьи. Ждём вас на нашем празднике любви!'
+  },
+  { 
+    name: 'Алёна и Александр', 
+    category: 'Гости',
+    message: 'Алёна и Саша, вы наши верные друзья! Этот день будет ярче с вашим присутствием. Ждём вас с нетерпением!'
+  },
+  { 
+    name: 'Оксана и Сергей', 
+    category: 'Гости',
+    message: 'Дорогие Оксана и Сергей, ваша энергия и позитив всегда заряжают нас. Будет здорово отпраздновать вместе!'
+  },
+  { 
+    name: 'Елизавета и Артём', 
+    category: 'Гости',
+    message: 'Лиза и Артём, ваша поддержка значит для нас очень много. Рады видеть вас на нашей свадьбе!'
+  },
+  { 
+    name: 'Андрей', 
+    category: 'Гости',
+    message: 'Дорогой Андрей, твоя дружба бесценна! Этот день не будет полным без тебя. Ждём с радостью!'
+  },
+  { 
+    name: 'Лидия', 
+    category: 'Гости',
+    message: 'Дорогая Лидия, твоё тепло и забота всегда согревают сердце. Будем рады видеть тебя на нашем празднике!'
+  },
+  { 
+    name: 'Никита', 
+    category: 'Гости',
+    message: 'Никита, ты настоящий друг! Твоё присутствие сделает этот день ещё более особенным. Ждём тебя!'
+  }
 ];
 
 const Index = () => {
@@ -35,8 +75,6 @@ const Index = () => {
   });
 
   const [submitted, setSubmitted] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -56,42 +94,7 @@ const Index = () => {
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    const handleUserInteraction = () => {
-      if (audioRef.current && !isPlaying) {
-        audioRef.current.play().then(() => {
-          setIsPlaying(true);
-        }).catch(err => {
-          console.log('Autoplay prevented:', err);
-        });
-      }
-      document.removeEventListener('click', handleUserInteraction);
-      document.removeEventListener('touchstart', handleUserInteraction);
-      document.removeEventListener('scroll', handleUserInteraction);
-    };
 
-    document.addEventListener('click', handleUserInteraction);
-    document.addEventListener('touchstart', handleUserInteraction);
-    document.addEventListener('scroll', handleUserInteraction);
-
-    return () => {
-      document.removeEventListener('click', handleUserInteraction);
-      document.removeEventListener('touchstart', handleUserInteraction);
-      document.removeEventListener('scroll', handleUserInteraction);
-    };
-  }, [isPlaying]);
-
-  const toggleMusic = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-        setIsPlaying(false);
-      } else {
-        audioRef.current.play();
-        setIsPlaying(true);
-      }
-    }
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,25 +103,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
-      <audio 
-        ref={audioRef} 
-        loop 
-        preload="auto"
-      >
-        <source src="/wedding-song.mp3" type="audio/mpeg" />
-      </audio>
-
-      <button
-        onClick={toggleMusic}
-        className="fixed top-6 right-6 z-50 w-14 h-14 bg-white/90 backdrop-blur-sm border-2 border-gold rounded-full shadow-lg hover:bg-gold hover:text-white transition-all duration-300 flex items-center justify-center group"
-        aria-label={isPlaying ? 'Пауза' : 'Воспроизвести музыку'}
-      >
-        {isPlaying ? (
-          <Icon name="Pause" className="w-6 h-6 text-gold group-hover:text-white" />
-        ) : (
-          <Icon name="Play" className="w-6 h-6 text-gold group-hover:text-white" />
-        )}
-      </button>
       <section className="min-h-screen flex items-center justify-center px-4 py-20 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-20 left-10 w-72 h-72 bg-gold rounded-full blur-3xl" />
@@ -258,19 +242,26 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="space-y-8">
             {guestsList.map((guest, idx) => (
               <Card 
                 key={idx}
-                className="p-6 bg-white border-2 border-gray-100 hover:border-gold transition-all duration-300 hover:shadow-lg"
+                className="p-8 bg-white border-2 border-gray-100 hover:border-gold transition-all duration-300 hover:shadow-lg"
               >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0">
-                    <Icon name="Heart" className="w-6 h-6 text-gold" />
+                <div className="flex flex-col md:flex-row gap-6">
+                  <div className="flex items-center gap-4 md:min-w-[250px]">
+                    <div className="w-14 h-14 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0">
+                      <Icon name="Heart" className="w-7 h-7 text-gold" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-semibold text-gray-900">{guest.name}</h3>
+                      <p className="text-sm text-gray-600 mt-1">{guest.category}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900">{guest.name}</h3>
-                    <p className="text-sm text-gray-600">{guest.category}</p>
+                  <div className="flex-1 border-l-2 border-gold/20 pl-6">
+                    <p className="text-lg text-gray-700 leading-relaxed italic">
+                      {guest.message}
+                    </p>
                   </div>
                 </div>
               </Card>
